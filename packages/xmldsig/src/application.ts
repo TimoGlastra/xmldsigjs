@@ -1,11 +1,12 @@
-import { CryptoEngine, setEngine } from 'pkijs';
-import { XE, XmlError } from 'xml-core';
+import { CryptoEngine, type ICryptoEngine, setEngine } from "pkijs";
+import { XE, XmlError } from "xml-core";
 
 export interface CryptoEx extends Crypto {
   name: string;
 }
 
 let engineCrypto: CryptoEx | null = null;
+const pkiEngines = new WeakMap<Crypto, ICryptoEngine>();
 
 export class Application {
   /**
@@ -30,14 +31,41 @@ export class Application {
   }
 
   public static isNodePlugin(): boolean {
-    return typeof self === 'undefined' && typeof window === 'undefined';
+    return typeof self === "undefined" && typeof window === "undefined";
   }
+}
+
+/**
+ * Returns the given crypto provider or the default one from the Application
+ * @param  {Crypto} crypto Crypto provider. Default is from Application
+ * @returns Crypto
+ */
+export function resolveCrypto(crypto?: Crypto): Crypto {
+  return crypto || Application.crypto;
+}
+
+/**
+ * Wraps the given crypto provider into a PKI.js engine. Engines are cached per provider.
+ * Returns undefined if no provider is given, then PKI.js uses its global engine.
+ * @param  {Crypto} crypto Crypto provider. Default is from Application
+ * @returns ICryptoEngine
+ */
+export function resolvePkiEngine(crypto?: Crypto): ICryptoEngine | undefined {
+  if (!crypto) {
+    return undefined;
+  }
+  let engine = pkiEngines.get(crypto);
+  if (!engine) {
+    engine = new CryptoEngine({ name: "xmldsigjs", crypto });
+    pkiEngines.set(crypto, engine);
+  }
+  return engine;
 }
 
 // set default w3 WebCrypto
 function init() {
   if (!Application.isNodePlugin()) {
-    Application.setEngine('W3 WebCrypto module', self.crypto);
+    Application.setEngine("W3 WebCrypto module", self.crypto);
   }
 }
 init();

@@ -1,10 +1,10 @@
-import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
+import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from "xml-core";
 
-import { DataObjects } from './data_object.js';
-import { KeyInfo } from './key_info.js';
-import { SignedInfo } from './signed_info.js';
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureObject } from './xml_object.js';
+import { DataObjects } from "./data_object.js";
+import { KeyInfo } from "./key_info.js";
+import { SignedInfo } from "./signed_info.js";
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureObject } from "./xml_object.js";
 
 /**
  * Represents the <Signature> element of an XML signature.
@@ -35,9 +35,9 @@ export class Signature extends XmlSignatureObject {
    */
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   /**
    * Gets or sets the SignedInfo of the current Signature.
@@ -46,7 +46,7 @@ export class Signature extends XmlSignatureObject {
     parser: SignedInfo,
     required: true,
   })
-  public SignedInfo: SignedInfo;
+  public SignedInfo!: SignedInfo;
 
   /**
    * Gets or sets the value of the digital signature.
@@ -59,7 +59,7 @@ export class Signature extends XmlSignatureObject {
     converter: XmlBase64Converter,
     defaultValue: null,
   })
-  public SignatureValue: Uint8Array | null;
+  public SignatureValue!: Uint8Array | null;
 
   /**
    * Gets or sets the KeyInfo of the current Signature.
@@ -67,11 +67,11 @@ export class Signature extends XmlSignatureObject {
   @XmlChildElement({
     parser: KeyInfo,
   })
-  public KeyInfo: KeyInfo;
+  public KeyInfo!: KeyInfo;
 
   @XmlChildElement({
     parser: DataObjects,
     noRoot: true,
   })
-  public ObjectList: DataObjects;
+  public ObjectList!: DataObjects;
 }

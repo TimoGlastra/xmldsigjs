@@ -1,7 +1,7 @@
-import { XmlAttribute, XmlElement } from 'xml-core';
+import { XmlAttribute, XmlElement } from "xml-core";
 
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureObject } from './xml_object.js';
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureObject } from "./xml_object.js";
 
 /**
  * Represents the <DigestMethod> element of an XML signature.
@@ -26,7 +26,7 @@ export class DigestMethod extends XmlSignatureObject {
     required: true,
     defaultValue: XmlSignature.DefaultDigestMethod,
   })
-  public Algorithm: string;
+  public Algorithm!: string;
 
   public constructor(hashNamespace?: string) {
     super();

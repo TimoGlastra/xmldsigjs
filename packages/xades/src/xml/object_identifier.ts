@@ -1,6 +1,6 @@
-import { XmlAttribute, XmlChildElement, XmlContent, XmlElement } from 'xml-core';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlContent, XmlElement } from "xml-core";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <ObjectIdentifier> element of an XML signature.
@@ -41,35 +41,35 @@ import { XadesCollection, XadesObject } from './xml_base.js';
  * ```
  */
 
-export type IdentifierQualifier = 'OIDAsURI' | 'OIDAsURN';
+export type IdentifierQualifier = "OIDAsURI" | "OIDAsURN";
 
 @XmlElement({ localName: XmlXades.ElementNames.Identifier })
 export class Identifier extends XadesObject {
   @XmlAttribute({ localName: XmlXades.AttributeNames.Qualifier })
-  public Qualifier: IdentifierQualifier;
+  public Qualifier!: IdentifierQualifier;
 
   @XmlContent({
-    defaultValue: '',
+    defaultValue: "",
     required: true,
   })
-  public Value: string;
+  public Value!: string;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.DocumentationReference })
 export class DocumentationReference extends XadesObject {
   @XmlContent({
-    defaultValue: '',
+    defaultValue: "",
     required: true,
   })
-  public Uri: string;
+  public Uri!: string;
 
-  protected OnLoadXml(e: Element) {
+  protected override OnLoadXml(e: Element) {
     if (e.textContent) {
       this.Uri = e.textContent;
     }
   }
 
-  protected OnGetXml(e: Element) {
+  protected override OnGetXml(e: Element) {
     if (this.Uri) {
       e.textContent = this.Uri;
     }
@@ -88,16 +88,16 @@ export class ObjectIdentifier extends XadesObject {
     parser: Identifier,
     required: true,
   })
-  public Identifier: Identifier;
+  public Identifier!: Identifier;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.Description,
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Description: string;
+  public Description!: string;
 
   @XmlChildElement({ parser: DocumentationReferences })
-  public DocumentationReferences: DocumentationReferences;
+  public DocumentationReferences!: DocumentationReferences;
 }

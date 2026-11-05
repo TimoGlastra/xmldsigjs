@@ -1,16 +1,10 @@
-import {
-  XmlAttribute,
-  XmlChildElement,
-  XmlElement,
-  XmlBase64Converter,
-  XmlNumberConverter,
-} from 'xml-core';
-import { Any } from './any.js';
-import { XadesDateTime } from './date_time.js';
-import { DigestAlgAndValueType } from './signing_certificate.js';
-import { UnsignedSignatureProperty } from './unsigned_signature_properties.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter, XmlNumberConverter } from "xml-core";
+import { Any } from "./any.js";
+import { XadesDateTime } from "./date_time.js";
+import { DigestAlgAndValueType } from "./signing_certificate.js";
+import type { UnsignedSignatureProperty } from "./unsigned_signature_properties.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <CompleteRevocationRefs> element of an XML signature.
@@ -90,7 +84,7 @@ export class ResponderID extends XadesObject {
     prefix: XmlXades.DefaultPrefix,
     required: true,
   })
-  public ByName: string;
+  public ByName!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.ByKey,
@@ -99,41 +93,41 @@ export class ResponderID extends XadesObject {
     converter: XmlBase64Converter,
     required: true,
   })
-  public ByKey: Uint8Array;
+  public ByKey!: Uint8Array;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.OCSPIdentifier })
 export class OCSPIdentifier extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.URI,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public URI: string;
+  public URI!: string;
 
   @XmlChildElement({
     parser: ResponderID,
     required: true,
   })
-  public ResponderID: ResponderID;
+  public ResponderID!: ResponderID;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.IssueTime,
     parser: XadesDateTime,
     required: true,
   })
-  public ProducedAt: XadesDateTime;
+  public ProducedAt!: XadesDateTime;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.OCSPRef })
 export class OCSPRef extends XadesObject {
   @XmlChildElement({ parser: OCSPIdentifier })
-  public OCSPIdentifier: OCSPIdentifier;
+  public OCSPIdentifier!: OCSPIdentifier;
 
   @XmlChildElement({
     parser: DigestAlgAndValueType,
     required: true,
   })
-  public DigestAlgAndValue: DigestAlgAndValueType;
+  public DigestAlgAndValue!: DigestAlgAndValueType;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.OCSPRefs })
@@ -143,9 +137,9 @@ export class OCSPRefs extends XadesCollection<OCSPRef> {}
 export class CRLIdentifier extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.URI,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public URI: string;
+  public URI!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.Issuer,
@@ -153,14 +147,14 @@ export class CRLIdentifier extends XadesObject {
     prefix: XmlXades.DefaultPrefix,
     required: true,
   })
-  public Issuer: string;
+  public Issuer!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.IssueTime,
     parser: XadesDateTime,
     required: true,
   })
-  public IssueTime: XadesDateTime;
+  public IssueTime!: XadesDateTime;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.Number,
@@ -168,7 +162,7 @@ export class CRLIdentifier extends XadesObject {
     prefix: XmlXades.DefaultPrefix,
     converter: XmlNumberConverter,
   })
-  public Number: number;
+  public Number!: number;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.CRLRef })
@@ -177,10 +171,10 @@ export class CRLRef extends XadesObject {
     parser: DigestAlgAndValueType,
     required: true,
   })
-  public DigestAlgAndValue: DigestAlgAndValueType;
+  public DigestAlgAndValue!: DigestAlgAndValueType;
 
   @XmlChildElement({ parser: CRLIdentifier })
-  public CRLIdentifier: CRLIdentifier;
+  public CRLIdentifier!: CRLIdentifier;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.CRLRefs })
@@ -190,16 +184,16 @@ export class CRLRefs extends XadesCollection<CRLRef> {}
 export class CompleteRevocationRefs extends XadesObject implements UnsignedSignatureProperty {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: CRLRefs })
-  public CRLRefs: CRLRefs;
+  public CRLRefs!: CRLRefs;
 
   @XmlChildElement({ parser: OCSPRefs })
-  public OCSPRefs: OCSPRefs;
+  public OCSPRefs!: OCSPRefs;
 
   @XmlChildElement({ parser: OtherRefs })
-  public OtherRefs: OtherRefs;
+  public OtherRefs!: OtherRefs;
 }

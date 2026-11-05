@@ -1,12 +1,8 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { CanonicalizationMethod } from 'xmldsigjs';
-import {
-  EncapsulatedTimeStampCollection,
-  Include,
-  XMLTimeStampCollection,
-} from './generic_time_stamp.js';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { CanonicalizationMethod } from "xmldsigjs";
+import { EncapsulatedTimeStampCollection, Include, XMLTimeStampCollection } from "./generic_time_stamp.js";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <XAdESTimeStamp> element of an XML signature.
@@ -35,25 +31,25 @@ import { XadesObject } from './xml_base.js';
 export class XAdESTimeStamp extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: Include })
-  public Include: Include;
+  public Include!: Include;
 
   @XmlChildElement({ parser: CanonicalizationMethod })
-  public CanonicalizationMethod: CanonicalizationMethod;
+  public CanonicalizationMethod!: CanonicalizationMethod;
 
   @XmlChildElement({
     parser: EncapsulatedTimeStampCollection,
     noRoot: true,
   })
-  public EncapsulatedTimeStamp: EncapsulatedTimeStampCollection;
+  public EncapsulatedTimeStamp!: EncapsulatedTimeStampCollection;
 
   @XmlChildElement({
     parser: XMLTimeStampCollection,
     noRoot: true,
   })
-  public XMLTimeStamp: XMLTimeStampCollection;
+  public XMLTimeStamp!: XMLTimeStampCollection;
 }

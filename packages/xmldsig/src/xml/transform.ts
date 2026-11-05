@@ -1,14 +1,7 @@
-import {
-  XE,
-  XmlError,
-  XmlAttribute,
-  XmlChildElement,
-  XmlElement,
-  IXmlSerializable,
-} from 'xml-core';
+import { XE, XmlError, XmlAttribute, XmlChildElement, XmlElement, type IXmlSerializable } from "xml-core";
 
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureObject } from './xml_object.js';
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureObject } from "./xml_object.js";
 
 /**
  * Represents the <Transform> element of an XML signature.
@@ -52,18 +45,18 @@ export class Transform extends XmlSignatureObject implements ITransform {
   // Public properties
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Algorithm,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Algorithm: string;
+  public Algorithm!: string;
 
   /**
    * XPath of the transformation
    */
   @XmlChildElement({
     localName: XmlSignature.ElementNames.XPath,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public XPath: string;
+  public XPath!: string;
 
   protected innerXml: Node | null = null;
 
@@ -78,7 +71,7 @@ export class Transform extends XmlSignatureObject implements ITransform {
 
   public LoadInnerXml(node: Node) {
     if (!node) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'node');
+      throw new XmlError(XE.PARAM_REQUIRED, "node");
     }
     this.innerXml = node;
   }

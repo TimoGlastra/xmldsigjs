@@ -1,39 +1,40 @@
-import { XE, XmlError } from './error.js';
-import { XmlBufferEncoding } from './types.js';
+import { base64, base64url, binary, hex, toUint8Array, utf8 } from "@peculiar/utils";
+import { XE, XmlError } from "./error.js";
+import type { XmlBufferEncoding } from "./types.js";
 
-declare let unescape: any;
-declare let escape: any;
+// The @peculiar/utils decoders always allocate a new ArrayBuffer, but are typed with ArrayBufferLike.
+type Bytes = Uint8Array<ArrayBuffer>;
 
 export class Convert {
-  public static ToString(buffer: BufferSource, enc: XmlBufferEncoding = 'utf8') {
-    const buf = new Uint8Array(buffer as ArrayBuffer);
+  public static ToString(buffer: BufferSource, enc: XmlBufferEncoding = "utf8") {
+    const buf = toUint8Array(buffer);
     switch (enc.toLowerCase()) {
-      case 'utf8':
+      case "utf8":
         return this.ToUtf8String(buf);
-      case 'binary':
+      case "binary":
         return this.ToBinary(buf);
-      case 'hex':
+      case "hex":
         return this.ToHex(buf);
-      case 'base64':
+      case "base64":
         return this.ToBase64(buf);
-      case 'base64url':
+      case "base64url":
         return this.ToBase64Url(buf);
       default:
         throw new XmlError(XE.CONVERTER_UNSUPPORTED);
     }
   }
 
-  public static FromString(str: string, enc: XmlBufferEncoding = 'utf8'): Uint8Array {
+  public static FromString(str: string, enc: XmlBufferEncoding = "utf8"): Uint8Array<ArrayBuffer> {
     switch (enc.toLowerCase()) {
-      case 'utf8':
+      case "utf8":
         return this.FromUtf8String(str);
-      case 'binary':
+      case "binary":
         return this.FromBinary(str);
-      case 'hex':
+      case "hex":
         return this.FromHex(str);
-      case 'base64':
+      case "base64":
         return this.FromBase64(str);
-      case 'base64url':
+      case "base64url":
         return this.FromBase64Url(str);
       default:
         throw new XmlError(XE.CONVERTER_UNSUPPORTED);
@@ -41,70 +42,46 @@ export class Convert {
   }
 
   public static ToBase64(buf: Uint8Array): string {
-    if (typeof btoa !== 'undefined') {
-      const binary = this.ToString(buf, 'binary');
-      return btoa(binary);
-    } else if (typeof Buffer !== 'undefined') {
-      return Buffer.from(buf).toString('base64');
-    } else {
-      throw new XmlError(XE.CONVERTER_UNSUPPORTED);
-    }
+    return base64.encode(buf);
   }
 
-  public static FromBase64(base64Text: string): Uint8Array {
-    // Prepare string
-    base64Text = base64Text
-      .replace(/\n/g, '')
-      .replace(/\r/g, '')
-      .replace(/\t/g, '')
-      .replace(/\s/g, '');
-    if (typeof atob !== 'undefined') {
-      return this.FromBinary(atob(base64Text));
-    } else if (typeof Buffer !== 'undefined') {
-      return new Uint8Array(Buffer.from(base64Text, 'base64'));
-    } else {
-      throw new XmlError(XE.CONVERTER_UNSUPPORTED);
-    }
+  /**
+   * Decodes Base64 text. Whitespace is ignored and missing padding is accepted, as in XML Schema base64Binary values.
+   * @throws {TypeError} The text is not Base64
+   */
+  public static FromBase64(base64Text: string): Uint8Array<ArrayBuffer> {
+    return base64.decode(base64.pad(base64Text.replace(/\s/g, ""))) as Bytes;
   }
 
-  public static FromBase64Url(base64url: string): Uint8Array {
-    return this.FromBase64(this.Base64Padding(base64url.replace(/-/g, '+').replace(/_/g, '/')));
+  /**
+   * Decodes Base64Url text, with or without padding.
+   * @throws {TypeError} The text is not Base64Url
+   */
+  public static FromBase64Url(base64url: string): Uint8Array<ArrayBuffer> {
+    return base64urlDecode(base64url.replace(/\s/g, ""));
   }
 
   public static ToBase64Url(data: Uint8Array): string {
-    return this.ToBase64(data).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    return base64url.encode(data);
   }
 
-  public static FromUtf8String(text: string): Uint8Array {
-    const s = unescape(encodeURIComponent(text));
-    const uintArray = new Uint8Array(s.length);
-    for (let i = 0; i < s.length; i++) {
-      uintArray[i] = s.charCodeAt(i);
-    }
-    return uintArray;
+  public static FromUtf8String(text: string): Uint8Array<ArrayBuffer> {
+    return utf8.encode(text) as Bytes;
   }
 
+  /**
+   * Decodes UTF-8 bytes. Invalid sequences become U+FFFD.
+   */
   public static ToUtf8String(buffer: Uint8Array): string {
-    const encodedString = String.fromCharCode.apply(null, buffer as any);
-    const decodedString = decodeURIComponent(escape(encodedString));
-    return decodedString;
+    return utf8.decode(buffer);
   }
 
-  public static FromBinary(text: string): Uint8Array {
-    const stringLength = text.length;
-    const resultView = new Uint8Array(stringLength);
-    for (let i = 0; i < stringLength; i++) {
-      resultView[i] = text.charCodeAt(i);
-    }
-    return resultView;
+  public static FromBinary(text: string): Uint8Array<ArrayBuffer> {
+    return binary.decode(text) as Bytes;
   }
 
   public static ToBinary(buffer: Uint8Array): string {
-    let resultString = '';
-    for (let i = 0; i < buffer.length; i++) {
-      resultString = resultString + String.fromCharCode(buffer[i]);
-    }
-    return resultString;
+    return binary.encode(buffer);
   }
 
   /**
@@ -113,13 +90,7 @@ export class Convert {
    * @returns string
    */
   public static ToHex(buffer: Uint8Array): string {
-    const splitter = '';
-    const res: string[] = [];
-    for (let i = 0; i < buffer.length; i++) {
-      const char = buffer[i].toString(16);
-      res.push(char.length === 1 ? '0' + char : char);
-    }
-    return res.join(splitter);
+    return hex.encode(buffer);
   }
 
   /**
@@ -128,16 +99,12 @@ export class Convert {
    * @static
    * @param {string} hexString
    * @returns {Uint8Array}
+   * @throws {TypeError} The text has an odd length or a character that is not hexadecimal
    *
    * @memberOf Convert
    */
-  public static FromHex(hexString: string): Uint8Array {
-    const res = new Uint8Array(hexString.length / 2);
-    for (let i = 0; i < hexString.length; i = i + 2) {
-      const c = hexString.slice(i, i + 2);
-      res[i / 2] = parseInt(c, 16);
-    }
-    return res;
+  public static FromHex(hexString: string): Uint8Array<ArrayBuffer> {
+    return hex.decode(hexString) as Bytes;
   }
 
   /**
@@ -171,9 +138,13 @@ export class Convert {
     const padCount = 4 - (base64.length % 4);
     if (padCount < 4) {
       for (let i = 0; i < padCount; i++) {
-        base64 += '=';
+        base64 += "=";
       }
     }
     return base64;
   }
+}
+
+function base64urlDecode(text: string): Bytes {
+  return base64url.decode(text, { allowPadding: true }) as Bytes;
 }

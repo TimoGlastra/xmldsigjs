@@ -1,9 +1,9 @@
-import { XmlAttribute, XmlBase64Converter, XmlChildElement, XmlElement } from 'xml-core';
+import { XmlAttribute, XmlBase64Converter, XmlChildElement, XmlElement } from "xml-core";
 
-import { DigestMethod } from './digest_method.js';
-import { Transforms } from './transform_collection.js';
-import { XmlSignature } from './xml_names.js';
-import { XmlSignatureCollection, XmlSignatureObject } from './xml_object.js';
+import { DigestMethod } from "./digest_method.js";
+import { Transforms } from "./transform_collection.js";
+import { XmlSignature } from "./xml_names.js";
+import { XmlSignatureCollection, XmlSignatureObject } from "./xml_object.js";
 
 /**
  * Represents the <Reference> element of an XML signature.
@@ -34,9 +34,9 @@ export class Reference extends XmlSignatureObject {
    * Gets or sets the ID of the current Reference.
    */
   @XmlAttribute({
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   /**
    * Gets or sets the Uri of the current Reference.
@@ -51,14 +51,14 @@ export class Reference extends XmlSignatureObject {
    */
   @XmlAttribute({
     localName: XmlSignature.AttributeNames.Type,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Type: string;
+  public Type!: string;
 
   @XmlChildElement({
     parser: Transforms,
   })
-  public Transforms: Transforms;
+  public Transforms!: Transforms;
 
   /**
    * Gets or sets the digest method Uniform Resource Identifier (URI) of the current
@@ -79,7 +79,7 @@ export class Reference extends XmlSignatureObject {
     prefix: XmlSignature.DefaultPrefix,
     converter: XmlBase64Converter,
   })
-  public DigestValue: Uint8Array;
+  public DigestValue!: Uint8Array;
 
   constructor(uri?: string) {
     super();
@@ -90,7 +90,7 @@ export class Reference extends XmlSignatureObject {
 }
 
 @XmlElement({
-  localName: 'References',
+  localName: "References",
   parser: Reference,
 })
 export class References extends XmlSignatureCollection<Reference> {}

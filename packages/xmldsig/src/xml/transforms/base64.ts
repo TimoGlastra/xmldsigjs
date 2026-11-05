@@ -1,18 +1,18 @@
-import { Convert, XE, XmlError } from 'xml-core';
+import { Convert, XE, XmlError } from "xml-core";
 
-import { Transform } from '../transform.js';
-import { XmlSignature } from '../xml_names.js';
+import { Transform } from "../transform.js";
+import { XmlSignature } from "../xml_names.js";
 
 export class XmlDsigBase64Transform extends Transform {
-  public Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform;
+  public override Algorithm = XmlSignature.AlgorithmNamespaces.XmlDsigBase64Transform;
 
   /**
    * Returns the output of the current XmlDsigBase64Transform object
    */
-  public GetOutput(): any {
+  public override GetOutput(): any {
     if (!this.innerXml) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'innerXml');
+      throw new XmlError(XE.PARAM_REQUIRED, "innerXml");
     }
-    return Convert.FromString(this.innerXml.textContent || '', 'base64');
+    return Convert.FromString(this.innerXml.textContent || "", "base64");
   }
 }

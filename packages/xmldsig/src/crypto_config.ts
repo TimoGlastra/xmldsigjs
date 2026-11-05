@@ -1,16 +1,10 @@
-import { XE, XmlError } from 'xml-core';
+import { XE, XmlError } from "xml-core";
 
-import {
-  IHashAlgorithm,
-  ISignatureAlgorithm,
-  HashAlgorithm,
-  SignatureAlgorithm,
-  ISignatureAlgorithmConstructable,
-  IHashAlgorithmConstructable,
-} from './algorithm.js';
-import { SignatureMethod } from './xml/signature_method.js';
+import type { IHashAlgorithm, ISignatureAlgorithm, HashAlgorithm, SignatureAlgorithm, ISignatureAlgorithmConstructable, IHashAlgorithmConstructable } from "./algorithm.js";
+import { SignatureMethod } from "./xml/signature_method.js";
 
-import { Transform, XmlSignature } from './xml/index.js';
+import type { Transform } from "./xml/index.js";
+import { XmlSignature } from "./xml/index.js";
 import {
   XmlDsigBase64Transform,
   XmlDsigC14NTransform,
@@ -18,13 +12,13 @@ import {
   XmlDsigEnvelopedSignatureTransform,
   XmlDsigExcC14NTransform,
   XmlDsigExcC14NWithCommentsTransform,
-} from './xml/transforms/index.js';
-import { AlgorithmFactory } from './algorithm.factory.js';
-import { algorithmRegistry } from './algorithm.registry.js';
-import { KeyInfoClauseConstructable } from './xml/key_infos/index.js';
-import { keyValueRegistry } from './xml/key_infos/key_info_clause.registry.js';
-import { transformRegistry } from './xml/transform.registry.js';
-import { ITransformConstructable } from './xml/transform.js';
+} from "./xml/transforms/index.js";
+import { AlgorithmFactory } from "./algorithm.factory.js";
+import { algorithmRegistry } from "./algorithm.registry.js";
+import type { KeyInfoClauseConstructable } from "./xml/key_infos/index.js";
+import { keyValueRegistry } from "./xml/key_infos/key_info_clause.registry.js";
+import { transformRegistry } from "./xml/transform.registry.js";
+import type { ITransformConstructable } from "./xml/transform.js";
 
 export class CryptoConfig {
   /**
@@ -39,7 +33,7 @@ export class CryptoConfig {
    */
   public static CreateFromName(name: string | null): Transform {
     if (!name) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'name');
+      throw new XmlError(XE.PARAM_REQUIRED, "name");
     }
 
     // First check the dynamic registry
@@ -104,14 +98,14 @@ export class CryptoConfig {
   }
 
   public static GetHashAlgorithm(algorithm: AlgorithmIdentifier): IHashAlgorithm {
-    const alg: Algorithm = typeof algorithm === 'string' ? { name: algorithm } : algorithm;
+    const alg: Algorithm = typeof algorithm === "string" ? { name: algorithm } : algorithm;
 
     return AlgorithmFactory.createHashAlgorithmFromAlgorithm(alg);
   }
 
   public static GetSignatureAlgorithm(algorithm: AlgorithmIdentifier): ISignatureAlgorithm {
-    const alg: Algorithm = typeof algorithm === 'string' ? { name: algorithm } : algorithm;
-    if ('hash' in alg && typeof alg.hash === 'string') {
+    const alg: Algorithm = typeof algorithm === "string" ? { name: algorithm } : algorithm;
+    if ("hash" in alg && typeof alg.hash === "string") {
       alg.hash = { name: alg.hash };
     }
 
@@ -129,19 +123,16 @@ export class CryptoConfig {
     return signatureMethod;
   }
 
-  static RegisterSignatureAlgorithm(
-    namespace: string,
-    algorithm: ISignatureAlgorithmConstructable,
-  ) {
+  static RegisterSignatureAlgorithm(namespace: string, algorithm: ISignatureAlgorithmConstructable) {
     algorithmRegistry.set(namespace, {
-      type: 'signature',
+      type: "signature",
       algorithm,
     });
   }
 
   static RegisterHashAlgorithm(namespace: string, algorithm: IHashAlgorithmConstructable) {
     algorithmRegistry.set(namespace, {
-      type: 'hash',
+      type: "hash",
       algorithm,
     });
   }

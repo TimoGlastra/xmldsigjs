@@ -1,7 +1,7 @@
-import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
-import { DigestAlgAndValueType } from './signing_certificate.js';
+import { XmlAttribute, XmlChildElement, XmlElement, XmlBase64Converter } from "xml-core";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
+import { DigestAlgAndValueType } from "./signing_certificate.js";
 
 /**
  * Represents the <CertIDTypeV2> element of an XML signature.
@@ -32,7 +32,7 @@ export class CertV2 extends XadesObject {
     parser: DigestAlgAndValueType,
     required: true,
   })
-  public CertDigest: DigestAlgAndValueType;
+  public CertDigest!: DigestAlgAndValueType;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.IssuerSerialV2,
@@ -41,14 +41,14 @@ export class CertV2 extends XadesObject {
     converter: XmlBase64Converter,
     required: false,
   })
-  public IssuerSerial: Uint8Array;
+  public IssuerSerial!: Uint8Array;
 
   @XmlAttribute({ localName: XmlXades.AttributeNames.URI })
-  public Uri: string;
+  public Uri!: string;
 }
 
 @XmlElement({
-  localName: 'CertIDListV2',
+  localName: "CertIDListV2",
   parser: CertV2,
 })
 export class CertIDListV2 extends XadesCollection<CertV2> {}

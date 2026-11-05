@@ -1,7 +1,7 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { EncapsulatedPKIData } from './encapsulated_pki_data.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { EncapsulatedPKIData } from "./encapsulated_pki_data.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <RevocationValues> element of an XML signature.
@@ -73,16 +73,16 @@ export class CRLValues extends XadesCollection<EncapsulatedCRLValue> {}
 export class RevocationValues extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: CRLValues })
-  public CRLValues: CRLValues;
+  public CRLValues!: CRLValues;
 
   @XmlChildElement({ parser: OCSPValues })
-  public OCSPValues: OCSPValues;
+  public OCSPValues!: OCSPValues;
 
   @XmlChildElement({ parser: OtherValues })
-  public OtherValues: OtherValues;
+  public OtherValues!: OtherValues;
 }

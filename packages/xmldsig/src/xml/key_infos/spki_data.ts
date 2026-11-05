@@ -1,8 +1,8 @@
-import { XmlChildElement, XmlElement, XmlBase64Converter } from 'xml-core';
+import { XmlChildElement, XmlElement, XmlBase64Converter } from "xml-core";
 
-import { Application } from '../../application.js';
-import { XmlSignature } from '../xml_names.js';
-import { KeyInfoClause } from './key_info_clause.js';
+import { resolveCrypto } from "../../application.js";
+import { XmlSignature } from "../xml_names.js";
+import { KeyInfoClause } from "./key_info_clause.js";
 
 /**
  * Represents the <SPKIData> element of an XML signature.
@@ -22,7 +22,7 @@ import { KeyInfoClause } from './key_info_clause.js';
   localName: XmlSignature.ElementNames.SPKIData,
 })
 export class SPKIData extends KeyInfoClause {
-  public Key: CryptoKey;
+  public override Key!: CryptoKey;
 
   @XmlChildElement({
     localName: XmlSignature.ElementNames.SPKIexp,
@@ -31,10 +31,10 @@ export class SPKIData extends KeyInfoClause {
     required: true,
     converter: XmlBase64Converter,
   })
-  public SPKIexp: Uint8Array | null;
+  public SPKIexp!: Uint8Array | null;
 
-  public async importKey(key: CryptoKey) {
-    const spki = await Application.crypto.subtle.exportKey('spki', key);
+  public async importKey(key: CryptoKey, crypto?: Crypto) {
+    const spki = await resolveCrypto(crypto).subtle.exportKey("spki", key);
 
     this.SPKIexp = new Uint8Array(spki);
     this.Key = key;
@@ -42,13 +42,11 @@ export class SPKIData extends KeyInfoClause {
     return this;
   }
 
-  public async exportKey(alg: Algorithm) {
+  public async exportKey(alg: Algorithm, crypto?: Crypto) {
     if (!this.SPKIexp) {
-      throw new Error('SPKI data is not defined');
+      throw new Error("SPKI data is not defined");
     }
-    const key = await Application.crypto.subtle.importKey('spki', this.SPKIexp, alg as any, true, [
-      'verify',
-    ]);
+    const key = await resolveCrypto(crypto).subtle.importKey("spki", this.SPKIexp as Uint8Array<ArrayBuffer>, alg as any, true, ["verify"]);
     this.Key = key;
     return key;
   }

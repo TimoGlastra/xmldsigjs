@@ -1,6 +1,6 @@
-import { XmlChildElement, XmlElement } from 'xml-core';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlChildElement, XmlElement } from "xml-core";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <SignatureProductionPlace> element of an XML signature.
@@ -22,33 +22,33 @@ import { XadesObject } from './xml_base.js';
 export class SignatureProductionPlace extends XadesObject {
   @XmlChildElement({
     localName: XmlXades.ElementNames.City,
-    defaultValue: '',
+    defaultValue: "",
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public City: string;
+  public City!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.StateOrProvince,
-    defaultValue: '',
+    defaultValue: "",
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public StateOrProvince: string;
+  public StateOrProvince!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.PostalCode,
-    defaultValue: '',
+    defaultValue: "",
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public PostalCode: string;
+  public PostalCode!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.CountryName,
-    defaultValue: '',
+    defaultValue: "",
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public CountryName: string;
+  public CountryName!: string;
 }

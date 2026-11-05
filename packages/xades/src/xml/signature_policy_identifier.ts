@@ -1,10 +1,10 @@
-import { XmlChildElement, XmlContent, XmlElement, IConverter, XmlNumberConverter } from 'xml-core';
-import { Transforms } from 'xmldsigjs';
-import { AnyCollection } from './any.js';
-import { ObjectIdentifier } from './object_identifier.js';
-import { DigestAlgAndValueType } from './signing_certificate.js';
-import { XmlXades } from './xml.js';
-import { XadesCollection, XadesObject } from './xml_base.js';
+import { XmlChildElement, XmlContent, XmlElement, type IConverter, XmlNumberConverter } from "xml-core";
+import { Transforms } from "xmldsigjs";
+import { AnyCollection } from "./any.js";
+import { ObjectIdentifier } from "./object_identifier.js";
+import { DigestAlgAndValueType } from "./signing_certificate.js";
+import { XmlXades } from "./xml.js";
+import { XadesCollection, XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <SignaturePolicyIdentifier> element of an XML signature.
@@ -61,17 +61,17 @@ export class SigPolicyHash extends DigestAlgAndValueType {}
 @XmlElement({ localName: XmlXades.ElementNames.SigPolicyQualifier })
 export class SigPolicyQualifier extends AnyCollection {}
 
-@XmlElement({ localName: 'int' })
+@XmlElement({ localName: "int" })
 export class Integer extends XadesObject {
   @XmlContent({
     converter: XmlNumberConverter,
     required: true,
   })
-  public Value: number;
+  public Value!: number;
 }
 
 @XmlElement({
-  localName: 'IntegerList',
+  localName: "IntegerList",
   parser: Integer,
 })
 export class IntegerList extends XadesCollection<Integer> {}
@@ -84,14 +84,14 @@ export class NoticeReference extends XadesObject {
     prefix: XmlXades.DefaultPrefix,
     required: true,
   })
-  public Organization: string;
+  public Organization!: string;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.NoticeNumbers,
     parser: IntegerList,
     required: true,
   })
-  public NoticeNumbers: IntegerList;
+  public NoticeNumbers!: IntegerList;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.SPUserNotice })
@@ -100,20 +100,20 @@ export class SPUserNotice extends XadesObject {
     localName: XmlXades.ElementNames.NoticeRef,
     parser: NoticeReference,
   })
-  public NoticeRef: NoticeReference;
+  public NoticeRef!: NoticeReference;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.ExplicitText,
     namespaceURI: XmlXades.NamespaceURI,
     prefix: XmlXades.DefaultPrefix,
   })
-  public ExplicitText: string;
+  public ExplicitText!: string;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.SPURI })
 export class SPURI extends XadesObject {
   @XmlContent()
-  public Value: string;
+  public Value!: string;
 }
 
 @XmlElement({
@@ -129,23 +129,23 @@ export class SignaturePolicyId extends XadesObject {
     parser: SigPolicyId,
     required: true,
   })
-  public SigPolicyId: SigPolicyId;
+  public SigPolicyId!: SigPolicyId;
 
   @XmlChildElement({ parser: Transforms })
-  public Transforms: Transforms;
+  public Transforms!: Transforms;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.SigPolicyHash,
     parser: SigPolicyHash,
     required: true,
   })
-  public SigPolicyHash: SigPolicyHash;
+  public SigPolicyHash!: SigPolicyHash;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.SigPolicyQualifiers,
     parser: SigPolicyQualifiers,
   })
-  public SigPolicyQualifiers: SigPolicyQualifiers;
+  public SigPolicyQualifiers!: SigPolicyQualifiers;
 }
 
 const XmlSignaturePolicyImpliedConverter: IConverter<boolean> = {
@@ -156,7 +156,7 @@ const XmlSignaturePolicyImpliedConverter: IConverter<boolean> = {
   },
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   get: (value: boolean) => {
-    return '';
+    return "";
   },
 };
 
@@ -168,7 +168,7 @@ export class SignaturePolicyIdentifier extends XadesObject {
     prefix: XmlXades.DefaultPrefix,
     parser: SignaturePolicyId,
   })
-  public SignaturePolicyId: SignaturePolicyId;
+  public SignaturePolicyId!: SignaturePolicyId;
 
   @XmlChildElement({
     localName: XmlXades.ElementNames.SignaturePolicyImplied,
@@ -177,5 +177,5 @@ export class SignaturePolicyIdentifier extends XadesObject {
     converter: XmlSignaturePolicyImpliedConverter,
     defaultValue: false,
   })
-  public SignaturePolicyImplied: boolean;
+  public SignaturePolicyImplied!: boolean;
 }

@@ -1,8 +1,9 @@
-import { Collection } from './collection.js';
-import { XE, XmlError } from './error.js';
-import { ICollection } from './types.js';
-import { isElement } from './utils.js';
-import { XmlObject } from './xml_object.js';
+import { Collection } from "./collection.js";
+import { XML_COLLECTION } from "./const.js";
+import { XE, XmlError } from "./error.js";
+import type { ICollection } from "./types.js";
+import { isElement } from "./utils.js";
+import { XmlObject } from "./xml_object.js";
 
 export class XmlCollection<I extends XmlObject> extends XmlObject implements ICollection<I> {
   public static parser: any;
@@ -20,7 +21,7 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
   // Collection
   protected items: I[] = [];
 
-  public HasChanged() {
+  public override HasChanged() {
     const res = super.HasChanged();
 
     const changed = this.Some((item) => item.HasChanged());
@@ -84,11 +85,11 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
     return this.GetIterator().some(cb);
   }
 
-  public IsEmpty() {
+  public override IsEmpty() {
     return this.Count === 0;
   }
 
-  protected OnGetXml(element: Element) {
+  protected override OnGetXml(element: Element) {
     for (const item of this.GetIterator()) {
       const el = item.GetXml();
       if (el) {
@@ -97,23 +98,14 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
     }
   }
 
-  protected OnLoadXml(element: Element) {
+  protected override OnLoadXml(element: Element) {
     const self = this.GetStatic();
     if (!self.parser) {
-      throw new XmlError(
-        XE.XML_EXCEPTION,
-        `${self.localName} doesn't have required 'parser' in @XmlElement`,
-      );
+      throw new XmlError(XE.XML_EXCEPTION, `${self.localName} doesn't have required 'parser' in @XmlElement`);
     }
     for (let i = 0; i < element.childNodes.length; i++) {
       const node = element.childNodes.item(i);
-      if (
-        !(
-          isElement(node) &&
-          node.localName === (self.parser as any).localName &&
-          node.namespaceURI == self.namespaceURI
-        )
-      ) {
+      if (!(isElement(node) && node.localName === (self.parser as any).localName && node.namespaceURI == self.namespaceURI)) {
         // Ignore wrong elements
         continue;
       }
@@ -125,3 +117,5 @@ export class XmlCollection<I extends XmlObject> extends XmlObject implements ICo
     }
   }
 }
+
+(XmlCollection.prototype as any)[XML_COLLECTION] = true;

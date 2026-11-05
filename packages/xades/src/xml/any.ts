@@ -1,6 +1,6 @@
-import { XmlContent, XmlElement } from 'xml-core';
-import { XadesCollection, XadesObject } from './xml_base.js';
-import { XmlXades } from './xml.js';
+import { XmlContent, XmlElement } from "xml-core";
+import { XadesCollection, XadesObject } from "./xml_base.js";
+import { XmlXades } from "./xml.js";
 
 /**
  * Represents the <Any> element of an XML signature.
@@ -19,7 +19,7 @@ import { XmlXades } from './xml.js';
 @XmlElement({ localName: XmlXades.ElementNames.Any })
 export class Any extends XadesObject {
   @XmlContent()
-  public Value: string;
+  public Value!: string;
 }
 
 @XmlElement({ localName: XmlXades.ElementNames.Any })

@@ -1,8 +1,16 @@
-# XAdESjs
+<h1 align="center">
+  XAdESjs
+</h1>
+
+<div align="center">
 
 ![NPM License](https://img.shields.io/npm/l/xadesjs)
-![NPM Version](https://img.shields.io/npm/v/xadesjs)
-![NPM Downloads](https://img.shields.io/npm/dm/xadesjs?label=npm)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/PeculiarVentures/xmldsigjs/publish.yml?branch=master&label=publish)
+[![npm version](https://img.shields.io/npm/v/xadesjs.svg)](https://www.npmjs.com/package/xadesjs)
+![Coveralls](https://img.shields.io/coverallsCoverage/github/PeculiarVentures/xmldsigjs)
+[![npm downloads](https://img.shields.io/npm/dm/xadesjs.svg)](https://www.npmjs.com/package/xadesjs)
+
+</div>
 
 XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScript built on XMLDSIGjs.
 
@@ -11,6 +19,15 @@ XML Advanced Electronic Signatures (XAdES) implementation in TypeScript/JavaScri
 ```bash
 npm install xadesjs
 ```
+
+## Breaking Changes In v3
+
+v3 is ESM-only and requires Node.js `^20.19.0 || >=22.12.0` (was `>=16`). xml-core, xmldsigjs and xadesjs are released together and all move to 3.0.0. CommonJS code can still `require("xadesjs")` on these versions; Node.js 22.0–22.11 can't. See the [full notes](https://github.com/PeculiarVentures/xmldsigjs#breaking-changes-in-v3).
+
+- **TypeScript compiling to CommonJS:** use `"module": "node20"` or `"nodenext"` (`node16` fails with TS1479). ESM and bundler setups need no changes.
+- **Jest in CommonJS mode:** switch to ESM mode or Vitest, or configure an ESM-to-CommonJS transformer and make sure `transformIgnorePatterns` doesn't exclude `xadesjs` and its peers.
+- **Deep imports** (`xadesjs/build/...`) are blocked by `exports`; import from `xadesjs`.
+- **Peer dependencies:** `xml-core` and `xmldsigjs` (`^3.0.0`) are peers instead of dependencies, so your app shares one copy of the `Application` engine and the algorithm and transform registries. npm installs peers automatically.
 
 ## Features
 
@@ -22,44 +39,44 @@ npm install xadesjs
 
 ## XAdES Profiles
 
-| Profile    | Digital Signature | Cryptographic Timestamp | Revocation References | Revocation Data | Secure Timestamp |
-|------------|-------------------|-------------------------|----------------------|-----------------|------------------|
-| **XAdES-BES** | ✓                 | ✗                       | ✗                    | ✗               | ✗                |
-| XAdES-T    | ✓                 | ✓                       | ✗                    | ✗               | ✗                |
-| XAdES-C    | ✓                 | ✓                       | ✓                    | ✗               | ✗                |
-| XAdES-X-L  | ✓                 | ✓                       | ✓                    | ✓               | ✗                |
-| XAdES-A    | ✓                 | ✓                       | ✓                    | ✓               | ✓                |
+| Profile       | Digital Signature | Cryptographic Timestamp | Revocation References | Revocation Data | Secure Timestamp |
+| ------------- | ----------------- | ----------------------- | --------------------- | --------------- | ---------------- |
+| **XAdES-BES** | ✓                 | ✗                       | ✗                     | ✗               | ✗                |
+| XAdES-T       | ✓                 | ✓                       | ✗                     | ✗               | ✗                |
+| XAdES-C       | ✓                 | ✓                       | ✓                     | ✗               | ✗                |
+| XAdES-X-L     | ✓                 | ✓                       | ✓                     | ✓               | ✗                |
+| XAdES-A       | ✓                 | ✓                       | ✓                     | ✓               | ✓                |
 
-*Currently only XAdES-BES is fully supported.*
+_Currently only XAdES-BES is fully supported._
 
 ## Quick Start
 
 ### Node.js Setup
 
-> **Note:** Use ESM modules (`.mjs` extension or `"type": "module"` in `package.json`).
+> **Note:** The package is ESM-only. CommonJS code can `require()` it on Node.js `^20.19.0 || >=22.12.0`.
 
 ```javascript
-import * as xadesjs from 'xadesjs';
-import { Crypto } from '@peculiar/webcrypto';
+import * as xadesjs from "xadesjs";
+import { Crypto } from "@peculiar/webcrypto";
 
-xadesjs.Application.setEngine('NodeJS', new Crypto());
+xadesjs.Application.setEngine("NodeJS", new Crypto());
 ```
 
 ### Browser Setup
 
 ```html
 <script type="module">
-import * as xadesjs from "https://unpkg.com/xadesjs@latest/dist/esm/index.js";
+  import * as xadesjs from "https://esm.sh/xadesjs";
 </script>
 ```
 
 ### Creating XAdES-BES Signature
 
 ```javascript
-import * as xadesjs from 'xadesjs';
-import { Crypto } from '@peculiar/webcrypto';
+import * as xadesjs from "xadesjs";
+import { Crypto } from "@peculiar/webcrypto";
 
-xadesjs.Application.setEngine('NodeJS', new Crypto());
+xadesjs.Application.setEngine("NodeJS", new Crypto());
 
 async function signXAdES() {
   // Generate key pair
@@ -68,34 +85,29 @@ async function signXAdES() {
       name: "RSASSA-PKCS1-v1_5",
       modulusLength: 2048,
       publicExponent: new Uint8Array([1, 0, 1]),
-      hash: "SHA-256"
+      hash: "SHA-256",
     },
     false,
-    ["sign", "verify"]
+    ["sign", "verify"],
   );
 
   // Parse XML document
-  const xml = xadesjs.Parse('<root><data>Hello World</data></root>');
+  const xml = xadesjs.Parse("<root><data>Hello World</data></root>");
 
   // Create XAdES signature
   const signedXml = new xadesjs.SignedXml();
-  await signedXml.Sign(
-    { name: "RSASSA-PKCS1-v1_5" },
-    keys.privateKey,
-    xml,
-    {
-      keyValue: keys.publicKey,
-      references: [{ hash: "SHA-256", transforms: ["enveloped"] }],
-      productionPlace: {
-        country: "US",
-        state: "California",
-        city: "San Francisco"
-      },
-      signerRole: {
-        claimed: ["Developer"]
-      }
-    }
-  );
+  await signedXml.Sign({ name: "RSASSA-PKCS1-v1_5" }, keys.privateKey, xml, {
+    keyValue: keys.publicKey,
+    references: [{ hash: "SHA-256", transforms: ["enveloped"] }],
+    productionPlace: {
+      country: "US",
+      state: "California",
+      city: "San Francisco",
+    },
+    signerRole: {
+      claimed: ["Developer"],
+    },
+  });
 
   console.log(signedXml.toString());
 }
@@ -104,20 +116,17 @@ async function signXAdES() {
 ### Verifying XAdES Signature
 
 ```javascript
-import * as xadesjs from 'xadesjs';
+import * as xadesjs from "xadesjs";
 
 async function verifyXAdES(signedXmlString) {
   const doc = xadesjs.Parse(signedXmlString);
-  const signatures = doc.getElementsByTagNameNS(
-    'http://www.w3.org/2000/09/xmldsig#',
-    'Signature'
-  );
+  const signatures = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
 
   const signedXml = new xadesjs.SignedXml(doc);
   signedXml.LoadXml(signatures[0]);
 
   const isValid = await signedXml.Verify();
-  console.log('XAdES signature valid:', isValid);
+  console.log("XAdES signature valid:", isValid);
 }
 ```
 
@@ -130,7 +139,8 @@ Sign(
   algorithm: Algorithm,
   key: CryptoKey,
   data: Document,
-  options?: OptionsXAdES
+  options?: OptionsXAdES,
+  crypto?: Crypto
 ): Promise<Signature>
 ```
 
@@ -156,7 +166,29 @@ interface OptionsXAdES {
     certified?: string[];
   };
   policy?: OptionsPolicyId;
+  // Reference to SignedProperties; hash defaults to the signing key's hash
+  signedPropertiesReference?: {
+    id?: string;
+    hash?: AlgorithmIdentifier;
+    transforms?: OptionsSignTransform[]; // e.g. ["exc-c14n"]
+  };
 }
+```
+
+## Crypto Provider
+
+Like XMLDSIGjs, every method doing cryptographic operations accepts a provider as its last
+argument, which takes precedence over the one set by `Application.setEngine()`:
+
+```typescript
+await signedXml.Sign(algorithm, key, doc, options, customCrypto);
+await signedXml.Verify(undefined, customCrypto);
+```
+
+The constructor needs a provider too, because it generates the Id of the signature:
+
+```typescript
+const signedXml = new xadesjs.SignedXml(doc, customCrypto);
 ```
 
 ## Algorithm Support
@@ -172,9 +204,9 @@ Same as XMLDSIGjs:
 To work with XML in Node.js, you need to register DOM and XPath dependencies:
 
 ```typescript
-import * as xmldom from '@xmldom/xmldom';
-import { setNodeDependencies } from 'xadesjs';
-import xpath from 'xpath';
+import * as xmldom from "@xmldom/xmldom";
+import { setNodeDependencies } from "xadesjs";
+import xpath from "xpath";
 
 setNodeDependencies({
   XMLSerializer: xmldom.XMLSerializer,
@@ -189,9 +221,9 @@ setNodeDependencies({
 In Node.js >=19 the global `crypto.webcrypto` is available. For earlier versions or broader compatibility, install and set the engine:
 
 ```ts
-import { Crypto } from '@peculiar/webcrypto';
-import { Application } from 'xmldsigjs';
-Application.setEngine('NodeJS', new Crypto());
+import { Crypto } from "@peculiar/webcrypto";
+import { Application } from "xmldsigjs";
+Application.setEngine("NodeJS", new Crypto());
 ```
 
 ## License

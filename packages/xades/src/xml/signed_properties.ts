@@ -1,8 +1,8 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { SignedDataObjectProperties } from './signed_data_object_properties.js';
-import { SignedSignatureProperties } from './signed_signature_properties.js';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { SignedDataObjectProperties } from "./signed_data_object_properties.js";
+import { SignedSignatureProperties } from "./signed_signature_properties.js";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <SignedProperties> element of an XML signature.
@@ -31,13 +31,13 @@ import { XadesObject } from './xml_base.js';
 export class SignedProperties extends XadesObject {
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: SignedSignatureProperties })
-  public SignedSignatureProperties: SignedSignatureProperties;
+  public SignedSignatureProperties!: SignedSignatureProperties;
 
   @XmlChildElement({ parser: SignedDataObjectProperties })
-  public SignedDataObjectProperties: SignedDataObjectProperties;
+  public SignedDataObjectProperties!: SignedDataObjectProperties;
 }

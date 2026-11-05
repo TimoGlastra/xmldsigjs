@@ -1,9 +1,9 @@
-import { XE, XmlError, Convert, XmlChildElement, XmlElement } from 'xml-core';
+import { XE, XmlError, Convert, XmlChildElement, XmlElement } from "xml-core";
 
-import { X509Certificate } from '../../pki/x509.js';
-import { XmlSignature } from '../xml_names.js';
-import { XmlSignatureObject } from '../xml_object.js';
-import { KeyInfoClause } from './key_info_clause.js';
+import { X509Certificate } from "../../pki/x509.js";
+import { XmlSignature } from "../xml_names.js";
+import { XmlSignatureObject } from "../xml_object.js";
+import { KeyInfoClause } from "./key_info_clause.js";
 
 /**
  * Represents the <X509Data> element of an XML signature.
@@ -40,7 +40,7 @@ export class X509IssuerSerial extends XmlSignatureObject {
     prefix: XmlSignature.DefaultPrefix,
     required: true,
   })
-  public X509IssuerName: string;
+  public X509IssuerName!: string;
 
   @XmlChildElement({
     localName: XmlSignature.ElementNames.X509SerialNumber,
@@ -48,7 +48,7 @@ export class X509IssuerSerial extends XmlSignatureObject {
     prefix: XmlSignature.DefaultPrefix,
     required: true,
   })
-  public X509SerialNumber: string;
+  public X509SerialNumber!: string;
 }
 
 export enum X509IncludeOption {
@@ -71,10 +71,10 @@ export interface IX509IssuerSerial {
 })
 export class KeyInfoX509Data extends KeyInfoClause {
   private x509crl: Uint8Array | null = null;
-  private IssuerSerialList: IX509IssuerSerial[];
+  private IssuerSerialList!: IX509IssuerSerial[];
   private SubjectKeyIdList: Uint8Array[] = [];
-  private SubjectNameList: string[];
-  private X509CertificateList: X509Certificate[];
+  private SubjectNameList!: string[];
+  private X509CertificateList!: X509Certificate[];
 
   public constructor();
   public constructor(rgbCert: Uint8Array);
@@ -83,7 +83,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
     super();
     if (cert) {
       if (cert instanceof Uint8Array) {
-        this.AddCertificate(new X509Certificate(cert));
+        this.AddCertificate(new X509Certificate(cert as Uint8Array<ArrayBuffer>));
       } else if (cert instanceof X509Certificate) {
         switch (includeOptions) {
           case X509IncludeOption.None:
@@ -108,13 +108,14 @@ export class KeyInfoX509Data extends KeyInfoClause {
   /**
    * Exports key from X509Data object
    * @param  {Algorithm} alg
+   * @param  {Crypto} crypto Crypto provider. Default is from Application
    * @returns Promise
    */
-  public async exportKey(alg?: RsaHashedImportParams | EcKeyImportParams) {
+  public async exportKey(alg?: RsaHashedImportParams | EcKeyImportParams, crypto?: Crypto) {
     if (!this.Certificates.length) {
       throw new XmlError(XE.NULL_REFERENCE);
     }
-    this.Key = await this.Certificates[0].exportKey(alg);
+    this.Key = await this.Certificates[0].exportKey(alg, crypto);
 
     return this.Key;
   }
@@ -166,7 +167,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
    */
   public AddCertificate(certificate: X509Certificate): void {
     if (!certificate) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'certificate');
+      throw new XmlError(XE.PARAM_REQUIRED, "certificate");
     }
     if (!this.X509CertificateList) {
       this.X509CertificateList = [];
@@ -182,7 +183,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
    */
   public AddIssuerSerial(issuerName: string, serialNumber: string): void {
     if (issuerName == null) {
-      throw new XmlError(XE.PARAM_REQUIRED, 'issuerName');
+      throw new XmlError(XE.PARAM_REQUIRED, "issuerName");
     }
     if (this.IssuerSerialList == null) {
       this.IssuerSerialList = [];
@@ -202,7 +203,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
       this.SubjectKeyIdList = [];
     }
 
-    if (typeof subjectKeyId === 'string') {
+    if (typeof subjectKeyId === "string") {
       if (subjectKeyId != null) {
         const id = Convert.FromBase64(subjectKeyId);
         this.SubjectKeyIdList.push(id);
@@ -230,7 +231,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
    * Returns an XML representation of the KeyInfoX509Data object.
    * @returns Element
    */
-  public GetXml(): Element {
+  public override GetXml(): Element {
     const doc = this.CreateDocument();
     const xel = this.CreateElement(doc);
 
@@ -239,20 +240,11 @@ export class KeyInfoX509Data extends KeyInfoClause {
     // <X509IssuerSerial>
     if (this.IssuerSerialList != null && this.IssuerSerialList.length > 0) {
       this.IssuerSerialList.forEach((iser) => {
-        const isl = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509IssuerSerial,
-        );
-        const xin = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509IssuerName,
-        );
+        const isl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerSerial);
+        const xin = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509IssuerName);
         xin.textContent = iser.issuerName;
         isl.appendChild(xin);
-        const xsn = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509SerialNumber,
-        );
+        const xsn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SerialNumber);
         xsn.textContent = iser.serialNumber;
         isl.appendChild(xsn);
         xel.appendChild(isl);
@@ -261,10 +253,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
     // <X509SKI>
     if (this.SubjectKeyIdList != null && this.SubjectKeyIdList.length > 0) {
       this.SubjectKeyIdList.forEach((skid) => {
-        const ski = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509SKI,
-        );
+        const ski = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SKI);
         ski.textContent = Convert.ToBase64(skid);
         xel.appendChild(ski);
       });
@@ -272,10 +261,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
     // <X509SubjectName>
     if (this.SubjectNameList != null && this.SubjectNameList.length > 0) {
       this.SubjectNameList.forEach((subject) => {
-        const sn = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509SubjectName,
-        );
+        const sn = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509SubjectName);
         sn.textContent = subject;
         xel.appendChild(sn);
       });
@@ -283,20 +269,14 @@ export class KeyInfoX509Data extends KeyInfoClause {
     // <X509Certificate>
     if (this.X509CertificateList != null && this.X509CertificateList.length > 0) {
       this.X509CertificateList.forEach((x509) => {
-        const cert = doc.createElementNS(
-          XmlSignature.NamespaceURI,
-          prefix + XmlSignature.ElementNames.X509Certificate,
-        );
+        const cert = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509Certificate);
         cert.textContent = Convert.ToBase64(x509.GetRaw());
         xel.appendChild(cert);
       });
     }
     // only one <X509CRL>
     if (this.x509crl != null) {
-      const crl = doc.createElementNS(
-        XmlSignature.NamespaceURI,
-        prefix + XmlSignature.ElementNames.X509CRL,
-      );
+      const crl = doc.createElementNS(XmlSignature.NamespaceURI, prefix + XmlSignature.ElementNames.X509CRL);
       crl.textContent = Convert.ToBase64(this.x509crl);
       xel.appendChild(crl);
     }
@@ -309,7 +289,7 @@ export class KeyInfoX509Data extends KeyInfoClause {
    * @param  {Element} element
    * @returns void
    */
-  public LoadXml(element: Element): void {
+  public override LoadXml(element: Element): void {
     super.LoadXml(element);
 
     if (this.IssuerSerialList) {
@@ -330,18 +310,8 @@ export class KeyInfoX509Data extends KeyInfoClause {
     let xnl = this.GetChildren(XmlSignature.ElementNames.X509IssuerSerial);
     if (xnl) {
       xnl.forEach((xel) => {
-        const issuer = XmlSignatureObject.GetChild(
-          xel,
-          XmlSignature.ElementNames.X509IssuerName,
-          XmlSignature.NamespaceURI,
-          true,
-        );
-        const serial = XmlSignatureObject.GetChild(
-          xel,
-          XmlSignature.ElementNames.X509SerialNumber,
-          XmlSignature.NamespaceURI,
-          true,
-        );
+        const issuer = XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509IssuerName, XmlSignature.NamespaceURI, true);
+        const serial = XmlSignatureObject.GetChild(xel, XmlSignature.ElementNames.X509SerialNumber, XmlSignature.NamespaceURI, true);
         if (issuer && issuer.textContent && serial && serial.textContent) {
           this.AddIssuerSerial(issuer.textContent, serial.textContent);
         }

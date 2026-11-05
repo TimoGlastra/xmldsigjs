@@ -1,8 +1,8 @@
-import { XmlAttribute, XmlChildElement, XmlElement } from 'xml-core';
-import { SignedProperties } from './signed_properties.js';
-import { UnsignedProperties } from './unsigned_properties.js';
-import { XmlXades } from './xml.js';
-import { XadesObject } from './xml_base.js';
+import { XmlAttribute, XmlChildElement, XmlElement } from "xml-core";
+import { SignedProperties } from "./signed_properties.js";
+import { UnsignedProperties } from "./unsigned_properties.js";
+import { XmlXades } from "./xml.js";
+import { XadesObject } from "./xml_base.js";
 
 /**
  * Represents the <QualifyingProperties> element of an XML signature.
@@ -26,17 +26,17 @@ export class QualifyingProperties extends XadesObject {
     localName: XmlXades.AttributeNames.Target,
     required: true,
   })
-  public Target: string;
+  public Target!: string;
 
   @XmlAttribute({
     localName: XmlXades.AttributeNames.Id,
-    defaultValue: '',
+    defaultValue: "",
   })
-  public Id: string;
+  public Id!: string;
 
   @XmlChildElement({ parser: SignedProperties })
-  public SignedProperties: SignedProperties;
+  public SignedProperties!: SignedProperties;
 
   @XmlChildElement({ parser: UnsignedProperties })
-  public UnsignedProperties: UnsignedProperties;
+  public UnsignedProperties!: UnsignedProperties;
 }
